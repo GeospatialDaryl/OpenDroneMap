@@ -81,6 +81,14 @@ parser.add_argument('--force-ccd',
                     type=float,
                     help='Override the ccd width information for the images')
 
+parser.add_argument('--min-num-features',
+                    metavar='<integer>',
+                    default=4000,
+                    type=int,
+                    help=('Minimum number of features to extract per image. '
+                          'More features leads to better results but slower '
+                          'execution.'))
+
 parser.add_argument('--matcher-threshold',
                     metavar='<percent>',
                     default=2.0,
@@ -98,7 +106,7 @@ parser.add_argument('--matcher-ratio',
 parser.add_argument('--matcher-preselect',
                     type=bool,
                     metavar='',
-                    default=True,
+                    default=False,
                     help=('use GPS exif data, if available, to match each '
                             'image only with its k-nearest neighbors, or all '
                             'images within a certain distance threshold'))
@@ -116,6 +124,13 @@ parser.add_argument('--matcher-kDistance',
                     default=20,
                     type=int,
                     help='')
+
+parser.add_argument('--matcher-k',
+                    metavar='<integer>',
+                    default=8,
+                    type=int,
+                    help='Number of k-nearest images to match '
+                         'when using OpenSfM')
 
 parser.add_argument('--cmvs-maxImages',
                     metavar='<integer>',
@@ -222,6 +237,12 @@ parser.add_argument('--odm_georeferencing-useGcp',
                     default = False,
                     help = 'set to true for enabling GCPs from the file above')
 
+parser.add_argument('--odm_orthophoto-resolution',
+                    metavar='<float > 0.0>',
+                    default=20.0,
+                    type=float,
+                    help=('Orthophoto ground resolution in pixels/meter'))
+
 parser.add_argument('--zip-results',
                     action='store_true',
                     default=False,
@@ -229,7 +250,7 @@ parser.add_argument('--zip-results',
 
 parser.add_argument('--use-opensfm',
                     type=bool,
-                    default=False,
+                    default=True,
                     help='use OpenSfM instead of Bundler to find the camera positions '
                          '(replaces getKeypoints, match and bundler steps)')
 
@@ -505,13 +526,14 @@ def getKeypoints():
 
         if fileObject["isOk"]:
             if not os.path.isfile(jobOptions["jobDir"] + "/" + fileObject["base"] + ".key.bin"):
-                vlsiftJobs += "echo -n \"" + str(c) + "/" + str(objectStats["good"]) + " - \" && convert -format pgm \"" + fileObject["step_0_resizedImage"] + "\" \"" + fileObject["step_1_pgmFile"] + "\""
+                vlsiftJobs += "echo -n \"     " + str(c).zfill(len(str(objectStats["good"]))) + "/" + str(objectStats["good"]) + " - \" && convert -format pgm \"" + fileObject["step_0_resizedImage"] + "\" \"" + fileObject["step_1_pgmFile"] + "\""
                 vlsiftJobs += " && \"" + BIN_PATH + "/vlsift\" \"" + fileObject["step_1_pgmFile"] + "\" -o \"" + fileObject["step_1_keyFile"] + ".sift\" > /dev/null && perl \"" + BIN_PATH + "/../convert_vlsift_to_lowesift.pl\" \"" + jobOptions["jobDir"] + "/" + fileObject["base"] + "\""
                 vlsiftJobs += " && gzip -f \"" + fileObject["step_1_keyFile"] + "\""
                 vlsiftJobs += " && rm -f \"" + fileObject["step_1_pgmFile"] + "\""
-                vlsiftJobs += " && rm -f \"" + fileObject["step_1_keyFile"] + ".sift\"\n"
+                vlsiftJobs += " && rm -f \"" + fileObject["step_1_keyFile"] + ".sift\""
+                vlsiftJobs += " && echo \"\"\n"
             else:
-                print "using existing " + jobOptions["jobDir"] + "/" + fileObject["base"] + ".key.bin"
+                print "     using existing " + jobOptions["jobDir"] + "/" + fileObject["base"] + ".key.bin"
 
     siftDest = open(jobOptions["step_1_vlsift"], 'w')
     siftDest.write(vlsiftJobs)
@@ -562,7 +584,7 @@ def match():
 
 # Match all image pairs
     else:
-        if args.matcher_preselect == "true":
+        if args.matcher_preselect:
             print "Failed to run pair preselection, proceeding with exhaustive matching."
         for i in range(0, objectStats["good"]):
             for j in range(i + 1, objectStats["good"]):
@@ -685,10 +707,13 @@ def opensfm():
     # Configure OpenSfM
     config = [
        "use_exif_size: no",
-       "features_process_size: {}".format(jobOptions["resizeTo"]),
-       "preemptive_threshold: 5",
+       "feature_process_size: {}".format(jobOptions["resizeTo"]),
+       "feature_min_frames: {}".format(args.min_num_features),
        "processes: {}".format(CORES),
     ]
+    if args.matcher_preselect:
+        config.append("matching_gps_neighbors: {}".format(args.matcher_k))
+
     with open('opensfm/config.yaml', 'w') as fout:
         fout.write("\n".join(config))
 
@@ -903,7 +928,7 @@ def odm_orthophoto():
     except:
         pass
 
-    run("\"" + BIN_PATH + "/odm_orthophoto\" -inputFile " + jobOptions["jobDir"] + "-results/odm_texturing/odm_textured_model_geo.obj -logFile " + jobOptions["jobDir"] + "/odm_orthophoto/odm_orthophoto_log.txt -outputFile " + jobOptions["jobDir"] + "-results/odm_orthphoto.png -resolution 20.0 -outputCornerFile " + jobOptions["jobDir"] + "/odm_orthphoto_corners.txt")
+    run("\"" + BIN_PATH + "/odm_orthophoto\" -inputFile " + jobOptions["jobDir"] + "-results/odm_texturing/odm_textured_model_geo.obj -logFile " + jobOptions["jobDir"] + "/odm_orthophoto/odm_orthophoto_log.txt -outputFile " + jobOptions["jobDir"] + "-results/odm_orthphoto.png -resolution " + str(args.odm_orthophoto_resolution) + " -outputCornerFile " + jobOptions["jobDir"] + "/odm_orthphoto_corners.txt")
 
     if "csString" not in jobOptions:
         parse_coordinate_system()
