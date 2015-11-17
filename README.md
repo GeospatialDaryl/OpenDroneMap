@@ -21,6 +21,14 @@ Developer's mailing list: http://lists.osgeo.org/cgi-bin/mailman/listinfo/opendr
 
 Overview video: https://www.youtube.com/watch?v=0UctfoeNB_Y
 
+Developers
+=================
+
+Help improve our software!
+
+1. Join our [Gitter](https://gitter.im/OpenDroneMap)
+2. Try to keep commits clean and simple
+3. Submit a pull request with detailed changes and test results
 
 Steps to get OpenDroneMap running:
 ==================================
@@ -43,6 +51,12 @@ Here are some other videos:
 - https://www.youtube.com/watch?v=m0i4GQdfl8A (2015-03-15)
 
 Now that texturing is in the code base, you can access the full textured meshes using MeshLab. Open MeshLab, choose `File:Import Mesh` and choose your textured mesh from a location similar to the following: `reconstruction-with-image-size-1200-results\odm_texturing\odm_textured_model.obj`
+
+For Ubuntu 15.10 users, this will help you get running: 
+```
+sudo apt-get install python-xmltodict
+sudo ln -s /usr/lib/x86_64-linux-gnu/libproj.so.9 /usr/lib/libproj.so
+```
 
 ---
 
