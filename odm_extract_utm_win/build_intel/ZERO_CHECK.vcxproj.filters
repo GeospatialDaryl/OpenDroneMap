@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\dkvandyke\Source\Repos\76_objSfM\objSfM\odm_extract_utm _win\build_intel\CMakeFiles\1d97c8de995cec7807f5f02ae08ef9b1\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{329F771B-9A50-4285-8CB1-CD74B3C950BD}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,3 @@
+odm_meshing_log.txt
+Error in OdmMeshing:
+Argument '-inputFile' has a bad value. (file not accessible)

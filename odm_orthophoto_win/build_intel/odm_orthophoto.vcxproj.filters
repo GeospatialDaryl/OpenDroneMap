@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\dkvandyke\Source\Repos\76_objSfM\objSfM\odm_orthophoto_win\src\Logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dkvandyke\Source\Repos\76_objSfM\objSfM\odm_orthophoto_win\src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dkvandyke\Source\Repos\76_objSfM\objSfM\odm_orthophoto_win\src\OdmOrthoPhoto.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\dkvandyke\Source\Repos\76_objSfM\objSfM\odm_orthophoto_win\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{D0E96D6D-E763-433A-A62A-79B0971E1954}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\dkvandyke\Source\Repos\76_objSfM\objSfM\odm_georef_win\src\FindTransform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dkvandyke\Source\Repos\76_objSfM\objSfM\odm_georef_win\src\Georef.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dkvandyke\Source\Repos\76_objSfM\objSfM\odm_georef_win\src\Logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dkvandyke\Source\Repos\76_objSfM\objSfM\odm_georef_win\src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dkvandyke\Source\Repos\76_objSfM\objSfM\odm_georef_win\src\modifiedPclFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\dkvandyke\Source\Repos\76_objSfM\objSfM\odm_georef_win\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{5C3DECDF-79BA-4AF8-8B5B-7A1335931ECB}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

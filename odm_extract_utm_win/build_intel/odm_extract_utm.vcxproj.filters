@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\dkvandyke\Source\Repos\76_objSfM\objSfM\odm_extract_utm _win\src\Logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dkvandyke\Source\Repos\76_objSfM\objSfM\odm_extract_utm _win\src\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\dkvandyke\Source\Repos\76_objSfM\objSfM\odm_extract_utm _win\src\UtmExtractor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\dkvandyke\Source\Repos\76_objSfM\objSfM\odm_extract_utm _win\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{727E08C1-78C2-4C7A-AD23-527502F1A424}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

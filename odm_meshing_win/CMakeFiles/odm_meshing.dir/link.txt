@@ -1,0 +1,1 @@
+/usr/bin/c++.exe    -Wl,--enable-auto-import CMakeFiles/odm_meshing.dir/src/Logger.cpp.o CMakeFiles/odm_meshing.dir/src/main.cpp.o CMakeFiles/odm_meshing.dir/src/OdmMeshing.cpp.o  -o odm_meshing.exe -Wl,--out-implib,libodm_meshing.dll.a -Wl,--major-image-version,0,--minor-image-version,0  
