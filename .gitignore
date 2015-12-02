@@ -1,11 +1,3 @@
-*~
-bin/
-include/
-lib/
-logs/
-share/
-src/
-
 cmvs.tar.gz
 parallel.tar.bz2
 LAStools.zip

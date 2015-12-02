@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestBase", "TestWin\TestBase.vcxproj", "{57496D03-A005-4650-B041-8E70DDA4A591}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TestWin", "TestWin\TestWin.vcxproj", "{E1C4EAB3-1677-46F7-92BC-1A1F309B2027}"
@@ -25,6 +27,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SiftGPU_Server", "ServerSiftGPU\SiftGPU_Server.vcxproj", "{65C987E1-F62C-4461-9E2C-BE1E8A770C51}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MultiThreadSIFT", "TestWin\MultiThreadSIFT.vcxproj", "{8F087E0E-0B77-4CF7-BCD7-F899DB361128}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleSIFT_CUDA_DVD", "SimpleSIFT_CUDA_DVD\SimpleSIFT_CUDA_DVD.vcxproj", "{B391A65B-003D-4BCF-8296-188EFFCED013}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -98,6 +102,14 @@ Global
 		{8F087E0E-0B77-4CF7-BCD7-F899DB361128}.Release|Win32.Build.0 = Release|Win32
 		{8F087E0E-0B77-4CF7-BCD7-F899DB361128}.Release|x64.ActiveCfg = Release|x64
 		{8F087E0E-0B77-4CF7-BCD7-F899DB361128}.Release|x64.Build.0 = Release|x64
+		{B391A65B-003D-4BCF-8296-188EFFCED013}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B391A65B-003D-4BCF-8296-188EFFCED013}.Debug|Win32.Build.0 = Debug|Win32
+		{B391A65B-003D-4BCF-8296-188EFFCED013}.Debug|x64.ActiveCfg = Debug|x64
+		{B391A65B-003D-4BCF-8296-188EFFCED013}.Debug|x64.Build.0 = Debug|x64
+		{B391A65B-003D-4BCF-8296-188EFFCED013}.Release|Win32.ActiveCfg = Release|Win32
+		{B391A65B-003D-4BCF-8296-188EFFCED013}.Release|Win32.Build.0 = Release|Win32
+		{B391A65B-003D-4BCF-8296-188EFFCED013}.Release|x64.ActiveCfg = Release|x64
+		{B391A65B-003D-4BCF-8296-188EFFCED013}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
