@@ -1,0 +1,16 @@
+odm_meshing_log.txt
+Reading point cloud at: Edit3.ply
+Successfully loaded 524714 points with corresponding normals from file.
+Octree depth used for reconstruction is: 9
+Estimated initial vertex count: 262144
+
+Reconstruction complete:
+Vertex count: 90241
+Triangle count: 180327
+
+Vertex count not specified, decimation cancelled.
+Saving mesh to file.
+Error in OdmMeshing:
+Error when saving mesh to file:
+
+

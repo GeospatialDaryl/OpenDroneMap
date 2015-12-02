@@ -1,0 +1,2 @@
+#TargetFrameworkVersion=v4.0:PlatformToolSet=v120:EnableManagedIncrementalBuild=false:VCToolArchitecture=Native32Bit
+Debug|Win32|C:\Users\dkvandyke\Source\Repos\77_objSfM_ii\objSfM\sift_win\SiftGPU-V400\SiftGPU\msvc\|
