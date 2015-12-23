@@ -1,4 +1,7 @@
 #include "OdmTexturing.hpp"
+//#include <Eigen/StdVector>
+#define EIGEN_USE_NEW_STDVECTOR
+#include <Eigen/StdVector>
 
 OdmTexturing::OdmTexturing() : log_(false)
 {
@@ -886,7 +889,17 @@ void OdmTexturing::createTextures()
     std::vector<std::vector<pcl::Vertices> > faceVector = std::vector<std::vector<pcl::Vertices> >(nrTextures_ + 1);
 
     // Container for texture coordinates according to submesh. Used to replace texture coordinates in mesh_.
-    std::vector<std::vector<Eigen::Vector2f> > textureCoordinatesVector = std::vector<std::vector<Eigen::Vector2f> >(nrTextures_ + 1);
+	/*
+	ORIT
+	|                                         |                         ||                                          |  num         
+	*/
+	//std::vector<std::vector<Eigen::Vector2f> > textureCoordinatesVector = std::vector<std::vector<Eigen::Vector2f> >(nrTextures_ + 1);
+	std::vector<std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f> > > textureCoordinatesVector = std::vector<std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f> > >(nrTextures_ + 1);
+	//
+	//std::vector<std::vector<Eigen::Vector2f > > textureCoordinatesVector = std::vector<std::vector<Eigen::Vector2f,  Eigen::aligned_allocator<Eigen::Vector2f>>,
+		//																							Eigen::aligned_allocator<				(nrTextures_ + 1);
+	//std::vector<std::vector<Eigen::Vector2f> > textureCoordinatesVector = std::vector < std::vector<Eigen::Vector2f>,
+	//	Eigen::aligned_allocator<std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f >> >> (nrTextures_ + 1);
 
     // Container for materials according to submesh. Used to replace materials in mesh_.
     std::vector<pcl::TexMaterial> materialVector = std::vector<pcl::TexMaterial>(nrTextures_ + 1);
@@ -1011,6 +1024,24 @@ void OdmTexturing::createTextures()
     // Replace polygons, texture coordinates and materials in mesh_
     mesh_->tex_polygons = faceVector;
    // mesh_->tex_coordinates = textureCoordinatesVector;
+   //  -->
+	std::vector < Eigen::Vector2f, std::allocator < Eigen::Vector2f > > A_ ;
+	std::allocator < std::vector<Eigen::Vector2f, std::allocator<Eigen::Vector2f>> > Ai_;
+
+	std::allocator < std::vector<Eigen::Vector2f, std::allocator<Eigen::Vector2f>> > B_ ;
+	std::allocator < std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f>> > Bi_;
+
+	//A_ = textureCoordinatesVector[0];
+	//B_ = textureCoordinatesVector[1];
+
+	 //Bi_ ;
+
+
+
+
+	Bi_ = (std::allocator < std::vector<Eigen::Vector2f, std::allocator<Eigen::Vector2f>> >) B_;
+
+	// <--
 	mesh_->tex_coordinates = textureCoordinatesVector;
     mesh_->tex_materials = materialVector;
 

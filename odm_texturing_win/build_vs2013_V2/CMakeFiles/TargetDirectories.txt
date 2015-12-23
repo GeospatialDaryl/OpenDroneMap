@@ -1,0 +1,3 @@
+C:/Users/dkvandyke/Source/Repos/77_objSfM_ii/objSfM/odm_texturing_win/build_vs2013_V2/CMakeFiles/odm_texturing.dir
+C:/Users/dkvandyke/Source/Repos/77_objSfM_ii/objSfM/odm_texturing_win/build_vs2013_V2/CMakeFiles/ALL_BUILD.dir
+C:/Users/dkvandyke/Source/Repos/77_objSfM_ii/objSfM/odm_texturing_win/build_vs2013_V2/CMakeFiles/ZERO_CHECK.dir

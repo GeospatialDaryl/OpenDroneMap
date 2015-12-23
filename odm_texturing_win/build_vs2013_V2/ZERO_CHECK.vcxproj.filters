@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\dkvandyke\Source\Repos\77_objSfM_ii\objSfM\odm_texturing_win\build_vs2013_V2\CMakeFiles\c373e8722a323642e0abc362b79eca77\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{873267F5-67F7-41FC-B94B-F5590DA44699}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
