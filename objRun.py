@@ -13,88 +13,43 @@ import shlex
 import fractions
 import argparse
 import errno
- 
 
+import classSfMPhoto
+from classSfMPhoto import SfMPhoto
+from classSfMConfig import *
+import modObjSfMGenerics
+#  FIX THIS TODO:
+from modObjSfMGenerics import *
+ 
 import knnMatch_exif
 
- 
-# # #
-# 0 - the defs
-# # #
+## # #
+## 0 - Init and Setup 
 
-# the defs
-CURRENT_DIR = os.getcwd()
-BIN_PATH_ABS = os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
-PYOPENCV_PATH = os.path.join(BIN_PATH_ABS, 'lib/python2.7/dist-packages')
-OPENSFM_PATH = os.path.join(BIN_PATH_ABS, "src/OpenSfM")
-CORES = multiprocessing.cpu_count()
+## # #
+objSfMConfig = SfMInstanceConfig()
 
- 
-objects = []
+#BIN_PATH,dictOSBins = objSfMConfig()
 
-# # # 
-# 0.i  Test OS Type
-# # #
-
-def setBinPath():
-    '''  Set BIN_PATH  '''
-    osType = os.name
-    dictOSBins = {}
-    
-    if osType == 'posix':
-        BIN_PATH = BIN_PATH_ABS + os.sep +"bin"
-        dictOSBins['exeJhead']   = 'jhead'
-        dictOSBins['exeSift']    = 'vlsift'
-    elif os.name == 'nt':
-        BIN_PATH = BIN_PATH_ABS + os.sep +"bin_win"
-        dictOSBins['exeJhead']   = 'jhead.exe'
-        dictOSBins['exeSift']    = 'SimpleSift.exe'
-    return BIN_PATH,dictOSBins
-
-BIN_PATH,dictOSBins = setBinPath()
-
-# # #
-# 1 - generic functions
-# # #
-
-def pyGrep(in1, in2):
-    import re
-    import sys
-
-    file = open(in2, "r")
-
-    for line in file:
-        if re.search(sys.argv[1], line):
-            print line,
-
-def extractFloat(inputString):
-    x = map(float, re.findall(r'[+-]?[0-9.]+', inputString))
-    return x
-
-def get_ccd_widths():
-    """Return the CCD Width of the camera listed in the JSON defs file."""
-    with open(BIN_PATH_ABS + '/ccd_defs.json') as jsonFile:
-        return json.load(jsonFile)
-
-def remove_values_from_list(the_list, val):
-    '''  Remove the <val> from <the_list> '''
-    return [value for value in the_list if value != val]
+## # #
+## 1 - generic functions
+## # #
 
 
 
-
-#->Q:  get_ccd_widths prolly belongs somewhere else
+##->Q:  get_ccd_widths prolly belongs somewhere else
 
 # #
 # 1 - Classes
 # #
 
-class ODMJob:
+class SfMJob:
     '''   ODMJob - a class for ODM Activities
     '''
-    def __init__(self, inputDir, args):
+    def __init__(self, inputDir, args, objSfMConfig):
         self.args = args
         self.pathDirJPGs = inputDir
+        self.objSfMConfig = objSfMConfig
         
         self.count    = 0
         self.good     = 0
@@ -105,18 +60,18 @@ class ODMJob:
         self.maxHeight= 0
         
         self.resizeTo = 0.
-        self.srcDir = CURRENT_DIR
+        self.srcDir = objSfMConfig.CURRENT_DIR
         self.utmZone = -999
         self.utmSouth = False
         self.utmEastOffset = 0.
         self.utmNorthOffset = 0.
         
-        self.jobOptions = {'resizeTo': 0, 'srcDir': CURRENT_DIR, 'utmZone': -999, 
+        self.jobOptions = {'resizeTo': 0, 'srcDir': objSfMConfig.CURRENT_DIR, 'utmZone': -999, 
                       'utmSouth': False, 'utmEastOffset': 0, 'utmNorthOffset': 0}
         
         self.dictJobLocations = {}   # hold our filepaths and dirs
 
-        self.listFiles = os.listdir(CURRENT_DIR)
+        self.listFiles = os.listdir(objSfMConfig.CURRENT_DIR)
         self.listJPG = []
         self.listObjPhotos = []    
 
@@ -137,9 +92,9 @@ class ODMJob:
             filename = filename.rstrip('\n')
             if not filename:
                 continue
-            filename = CURRENT_DIR + os.sep + filename 
+            filename = objSfMConfig.CURRENT_DIR + os.sep + filename 
             print filename
-            self.listObjPhotos.append( ODMPhoto( filename, self) )        
+            self.listObjPhotos.append( SfMPhoto( filename, self) )        
 
     def resize(self):
         print "\n  - preparing images - " + now()
@@ -385,182 +340,182 @@ class ODMJob:
     
 
         
-class ODMPhoto:
-    """   ODMPhoto - a class for ODMPhotos
-    """
+#class ODMPhoto:
+    #"""   ODMPhoto - a class for ODMPhotos
+    #"""
 
-    def __init__(self, inputJPG, objODMJob):
-        #general purpose
-        verbose = False
-        # object attributes
-        self.dictStepVals           = {}
-        self.pathToContainingFolder = os.path.split(inputJPG)[0]
-        self.strFileName            = os.path.split(inputJPG)[1]
-        self.strFileNameBase        = os.path.splitext(self.strFileName)[0]
-        self.strFileNameExt         = os.path.splitext(self.strFileName)[1]
+    #def __init__(self, inputJPG, objODMJob):
+        ##general purpose
+        #verbose = False
+        ## object attributes
+        #self.dictStepVals           = {}
+        #self.pathToContainingFolder = os.path.split(inputJPG)[0]
+        #self.strFileName            = os.path.split(inputJPG)[1]
+        #self.strFileNameBase        = os.path.splitext(self.strFileName)[0]
+        #self.strFileNameExt         = os.path.splitext(self.strFileName)[1]
         
-        #start pipe for jhead
-        cmdSrc = BIN_PATH + os.sep + dictOSBins['exeJhead'] + " " + CURRENT_DIR + os.sep + self.strFileName
-        srcProcess = subprocess.Popen(cmdSrc, stdout=subprocess.PIPE)
+        ##start pipe for jhead
+        #cmdSrc = BIN_PATH + os.sep + dictOSBins['exeJhead'] + " " + CURRENT_DIR + os.sep + self.strFileName
+        #srcProcess = subprocess.Popen(cmdSrc, stdout=subprocess.PIPE)
 
-        stdout, stderr = srcProcess.communicate()
-        stringOutput = stdout.decode('ascii')
+        #stdout, stderr = srcProcess.communicate()
+        #stringOutput = stdout.decode('ascii')
         
-        #listOutput is the list of params to be processed
-        listOutput_ori = stringOutput.splitlines()
-        listOutput = remove_values_from_list(listOutput_ori,u"")
+        ##listOutput is the list of params to be processed
+        #listOutput_ori = stringOutput.splitlines()
+        #listOutput = remove_values_from_list(listOutput_ori,u"")
         
-        intListCount = 0
-        intNumCameraAtts = len(listOutput)
+        #intListCount = 0
+        #intNumCameraAtts = len(listOutput)
         
-        flagDoneList = False
+        #flagDoneList = False
         
-        if verbose:  print listOutput
+        #if verbose:  print listOutput
         
-        #register all values from the list of JHead Output
-        for lines in listOutput:
-            # check if we've read all atts
-            intListCount += 1
-            if intListCount == intNumCameraAtts: flagDoneList = True
+        ##register all values from the list of JHead Output
+        #for lines in listOutput:
+            ## check if we've read all atts
+            #intListCount += 1
+            #if intListCount == intNumCameraAtts: flagDoneList = True
            
-            #extract and proceed            
-            firstColon = lines.find(":")
-            tempKey =   lines[:firstColon].strip()
-            tempVal = lines[firstColon+1:].strip()
+            ##extract and proceed            
+            #firstColon = lines.find(":")
+            #tempKey =   lines[:firstColon].strip()
+            #tempVal = lines[firstColon+1:].strip()
             
-            if verbose:   print tempKey,tempVal
-            # all them values
-            if tempKey == 'File name': self.fileName = tempVal
-            elif tempKey == 'File size': self.fileSize= tempVal
-            elif tempKey == 'File date': self.fileDate = tempVal
-            elif tempKey == 'Camera make': self.cameraMake = tempVal
-            elif tempKey == 'Camera model': self.cameraModel = tempVal
-            elif tempKey == 'Date/Time': self.dateTime = tempVal
-            elif tempKey == 'Resolution': self.resolution = tempVal
-            elif tempKey == 'Flash used': self.flashUsed = tempVal
-            elif tempKey == 'Focal length': self.focalLength = tempVal
-            elif tempKey == 'CCD width': self.ccdWidth = tempVal
-            elif tempKey == 'Exposure time': self.exposureTime = tempVal
-            elif tempKey == 'Aperture': self.aperture = tempVal
-            elif tempKey == 'Focus dist.': self.focusDist = tempVal
-            elif tempKey == 'ISO equiv.': self.isoEquiv= tempVal
-            elif tempKey == 'Whitebalance': self.whitebalance = tempVal
-            elif tempKey == 'Metering Mode': self.meteringMode = tempVal
-            elif tempKey == 'GPS Latitude': self.gpsLatitude = tempVal
-            elif tempKey == 'GPS Longitude': self.gpsLongitude = tempVal
-            elif tempKey == 'GPS Altitude': self.gpsAltitude = tempVal
-            elif tempKey == 'JPEG Quality': self.jpgQuality = tempVal	
-            #  better object attribute names; keep old for compatability
-            #  shallow references point to same stack space
-            self.fullPathAndName = self.fileName
+            #if verbose:   print tempKey,tempVal
+            ## all them values
+            #if tempKey == 'File name': self.fileName = tempVal
+            #elif tempKey == 'File size': self.fileSize= tempVal
+            #elif tempKey == 'File date': self.fileDate = tempVal
+            #elif tempKey == 'Camera make': self.cameraMake = tempVal
+            #elif tempKey == 'Camera model': self.cameraModel = tempVal
+            #elif tempKey == 'Date/Time': self.dateTime = tempVal
+            #elif tempKey == 'Resolution': self.resolution = tempVal
+            #elif tempKey == 'Flash used': self.flashUsed = tempVal
+            #elif tempKey == 'Focal length': self.focalLength = tempVal
+            #elif tempKey == 'CCD width': self.ccdWidth = tempVal
+            #elif tempKey == 'Exposure time': self.exposureTime = tempVal
+            #elif tempKey == 'Aperture': self.aperture = tempVal
+            #elif tempKey == 'Focus dist.': self.focusDist = tempVal
+            #elif tempKey == 'ISO equiv.': self.isoEquiv= tempVal
+            #elif tempKey == 'Whitebalance': self.whitebalance = tempVal
+            #elif tempKey == 'Metering Mode': self.meteringMode = tempVal
+            #elif tempKey == 'GPS Latitude': self.gpsLatitude = tempVal
+            #elif tempKey == 'GPS Longitude': self.gpsLongitude = tempVal
+            #elif tempKey == 'GPS Altitude': self.gpsAltitude = tempVal
+            #elif tempKey == 'JPEG Quality': self.jpgQuality = tempVal	
+            ##  better object attribute names; keep old for compatability
+            ##  shallow references point to same stack space
+            #self.fullPathAndName = self.fileName
 
-            # attribute 'id' set to more specific of the maker or model
-            try:
-                if self.cameraMake:
-                    self.make = self.cameraMake
-                    self.id = self.cameraMake + " " + self.cameraModel
-            except:  pass
+            ## attribute 'id' set to more specific of the maker or model
+            #try:
+                #if self.cameraMake:
+                    #self.make = self.cameraMake
+                    #self.id = self.cameraMake + " " + self.cameraModel
+            #except:  pass
 
             
-            try:
-                if self.cameraModel:
-                    self.model = self.cameraModel
-                    self.id = self.cameraMake + " " + self.cameraModel
-            except:  pass
+            #try:
+                #if self.cameraModel:
+                    #self.model = self.cameraModel
+                    #self.id = self.cameraMake + " " + self.cameraModel
+            #except:  pass
             
-            # parse resolution field 
-            try:
-                match = re.search("([0-9]*) x ([0-9]*)",self.resolution)
-                if match:
-                    self.width  = int(match.group(1).strip())
-                    self.height = int(match.group(2).strip())
-            except:  pass
+            ## parse resolution field 
+            #try:
+                #match = re.search("([0-9]*) x ([0-9]*)",self.resolution)
+                #if match:
+                    #self.width  = int(match.group(1).strip())
+                    #self.height = int(match.group(2).strip())
+            #except:  pass
             
-            #parse force-focal
-            try:
-                if not '--force-focal' in args:
-                    match = re.search(":[\ ]*([0-9\.]*)mm", self.focalLength)
-                    if match:
-                        self.focal = float((match.group()[1:-2]).strip())
-                else:
-                    self.focal = args['--force-focal']
-            except: pass
+            ##parse force-focal
+            #try:
+                #if not '--force-focal' in args:
+                    #match = re.search(":[\ ]*([0-9\.]*)mm", self.focalLength)
+                    #if match:
+                        #self.focal = float((match.group()[1:-2]).strip())
+                #else:
+                    #self.focal = args['--force-focal']
+            #except: pass
 
-            #parse force-ccd
-            if 'ccd' in lines.lower():
-                if not '--force-ccd' in args:
-                    try:
-                        floats = extractFloat(self.ccdWidth)
-                        self.ccd = floats[0]
-                    except:
-                        try:
-                            self.ccd = float(ccdWidths[self.id])
-                        except: pass
-                else:
-                    self.ccd = args['--force-ccd']
+            ##parse force-ccd
+            #if 'ccd' in lines.lower():
+                #if not '--force-ccd' in args:
+                    #try:
+                        #floats = extractFloat(self.ccdWidth)
+                        #self.ccd = floats[0]
+                    #except:
+                        #try:
+                            #self.ccd = float(ccdWidths[self.id])
+                        #except: pass
+                #else:
+                    #self.ccd = args['--force-ccd']
 
-            try:                
-                if self.id:
-                    self.ccd = float(ccdWidths[self.id])
-            except:
-                pass
-            if verbose:  print intListCount
+            #try:                
+                #if self.id:
+                    #self.ccd = float(ccdWidths[self.id])
+            #except:
+                #pass
+            #if verbose:  print intListCount
             
-            if flagDoneList:
-                try:
-                    if self.width > self.height:
-                        self.focalpx = self.width * (self.focal / self.ccd)
-                    else:
-                        self.focalpx = self.height * (self.focal / self.ccd)
+            #if flagDoneList:
+                #try:
+                    #if self.width > self.height:
+                        #self.focalpx = self.width * (self.focal / self.ccd)
+                    #else:
+                        #self.focalpx = self.height * (self.focal / self.ccd)
         
-                    self.isOk = True
-                    objODMJob.good += 1
+                    #self.isOk = True
+                    #objODMJob.good += 1
         
-                    print "     using " + self.fileName + "     dimensions: " + \
-                          str(self.width) + "x" + str(self.height)\
-                          + " | focal: " + str(self.focal) \
-                          + "mm | ccd: " + str(self.ccd) + "mm"
+                    #print "     using " + self.fileName + "     dimensions: " + \
+                          #str(self.width) + "x" + str(self.height)\
+                          #+ " | focal: " + str(self.focal) \
+                          #+ "mm | ccd: " + str(self.ccd) + "mm"
                     
-                except:
-                    self.isOk = False
-                    objODMJob.bad += 1
+                #except:
+                    #self.isOk = False
+                    #objODMJob.bad += 1
     
-                    try:
-                        print "\n    no CCD width or focal length found for "\
-                              + self.fileName+ " - camera: \"" + self.id+ "\""
-                    except:
-                        print "\n    no CCD width or focal length found"
+                    #try:
+                        #print "\n    no CCD width or focal length found for "\
+                              #+ self.fileName+ " - camera: \"" + self.id+ "\""
+                    #except:
+                        #print "\n    no CCD width or focal length found"
             
-                #either way increment total count
-                objODMJob.count += 1
+                ##either way increment total count
+                #objODMJob.count += 1
     
-                #populate & update max/mins
+                ##populate & update max/mins
                 
-                if objODMJob.minWidth == 0:
-                    objODMJob.minWidth = self.width
+                #if objODMJob.minWidth == 0:
+                    #objODMJob.minWidth = self.width
                                
-                if objODMJob.minHeight == 0:
-                    objODMJob.minHeight = self.height
+                #if objODMJob.minHeight == 0:
+                    #objODMJob.minHeight = self.height
 
-                if objODMJob.minWidth < self.width:
-                    objODMJob.minWidth = self.minWidth
-                else:
-                    objODMJob.minWidth = self.width
+                #if objODMJob.minWidth < self.width:
+                    #objODMJob.minWidth = self.minWidth
+                #else:
+                    #objODMJob.minWidth = self.width
                
-                if objODMJob.minHeight < self.height:
-                    objODMJob.minHeight = objODMJob.minHeight
-                else:
-                    objODMJob.minHeight = self.height
+                #if objODMJob.minHeight < self.height:
+                    #objODMJob.minHeight = objODMJob.minHeight
+                #else:
+                    #objODMJob.minHeight = self.height
 
-                if objODMJob.maxWidth > self.width:
-                    objODMJob.maxWidth = objODMJob.maxWidth
-                else:
-                    objODMJob.maxWidth = self.width
+                #if objODMJob.maxWidth > self.width:
+                    #objODMJob.maxWidth = objODMJob.maxWidth
+                #else:
+                    #objODMJob.maxWidth = self.width
 
-                if objODMJob.maxHeight > self.height:
-                    objODMJob.maxHeight = objODMJob.maxHeight
-                else:
-                    objODMJob.maxHeight = self.height
+                #if objODMJob.maxHeight > self.height:
+                    #objODMJob.maxHeight = objODMJob.maxHeight
+                #else:
+                    #objODMJob.maxHeight = self.height
     
 
 
@@ -570,21 +525,18 @@ class ODMPhoto:
 
 def get_ccd_widths():
     """Return the CCD Width of the camera listed in the JSON defs file."""
-    with open(BIN_PATH_ABS + '/ccd_defs.json') as jsonFile:
+    with open(objSfMConfig.BIN_PATH_ABS + '/ccd_defs.json') as jsonFile:
         return json.load(jsonFile)
 
 objects = []
 ccdWidths = get_ccd_widths()
-
-BIN_PATH,dictOSBins = setBinPath()
-
 
 objectStats = {
     'count': 0, 'good': 0, 'bad': 0, 'minWidth': 0, 'minHeight': 0,
     'maxWidth': 0, 'maxHeight': 0
     }
 
-jobOptions = {'resizeTo': 0, 'srcDir': CURRENT_DIR, 'utmZone': -999,
+jobOptions = {'resizeTo': 0, 'srcDir': objSfMConfig.CURRENT_DIR, 'utmZone': -999,
               'utmSouth': False, 'utmEastOffset': 0, 'utmNorthOffset': 0}
 
 # parse arguments
@@ -855,24 +807,6 @@ def run_and_grep(cmdSrc, grepTerm):
         if grepTerm in lines:
             return lines
 
-def mkdir_p(path):
-    '''Make a directory including parent directories.
-    '''
-    try:
-        os.makedirs(path)
-    except os.error as exc:
-        if exc.errno != errno.EEXIST or not os.path.isdir(path):
-            raise
-
-
-def calculate_EPSG(utmZone, south):
-    """Calculate and return the EPSG"""
-    if south:
-        return 32700 + utmZone
-    else:
-        return 32600 + utmZone
-
-
 def parse_coordinate_system():
     """Write attributes to jobOptions from coord file"""
     if os.path.isfile(jobOptions['jobDir'] +
@@ -900,63 +834,63 @@ def parse_coordinate_system():
 # # # 
 # 3b is this really part of main?
 # # # 
-def prepare_objects():
+def prepare_objects(objSfMConfig):
     '''  Really part of main flow
     '''
     ## get the source list
 
-    objODMJob = ODMJob(CURRENT_DIR, args)
+    objSfMJob = SfMJob(objSfMConfig.CURRENT_DIR, args, objSfMConfig)
 
-    if not objODMJob.good > 0:
+    if not objSfMJob.good > 0:
         print "\n    found no usable images - quitting\n"
         sys.exit()
     else:
-        print "\n    found " + str(objODMJob.good) + " usable images"
+        print "\n    found " + str(objSfMJob.good) + " usable images"
 
     print "\n"
 
 
-    objODMJob.resizeTo = args.resize_to
+    objSfMJob.resizeTo = args.resize_to
 
  
-    print "  using max image size of " + str( objODMJob.resizeTo) + " x " + str(objODMJob.resizeTo)
+    print "  using max image size of " + str( objSfMJob.resizeTo) + " x " + str(objSfMJob.resizeTo)
 
-    objODMJob.jobDir = objODMJob.srcDir + "//reconstruction-with-image-size-" + str( objODMJob.resizeTo)
+    objSfMJob.jobDir = objSfMJob.srcDir + "//reconstruction-with-image-size-" + str( objSfMJob.resizeTo)
 
-    objODMJob.dictJobLocations["step_0_resizedImage"]   = objODMJob.jobDir 
+    objSfMJob.dictJobLocations["step_0_resizedImage"]   = objSfMJob.jobDir 
 
-    objODMJob.dictJobLocations["step_1_convert"]        = objODMJob.jobDir + "/_convert.templist.txt"
-    objODMJob.dictJobLocations["step_1_vlsift"]         = objODMJob.jobDir + "/_vlsift.templist.txt"
-    objODMJob.dictJobLocations["step_1_gzip"]           = objODMJob.jobDir + "/_gzip.templist.txt"
+    objSfMJob.dictJobLocations["step_1_convert"]        = objSfMJob.jobDir + "/_convert.templist.txt"
+    objSfMJob.dictJobLocations["step_1_vlsift"]         = objSfMJob.jobDir + "/_vlsift.templist.txt"
+    objSfMJob.dictJobLocations["step_1_gzip"]           = objSfMJob.jobDir + "/_gzip.templist.txt"
  
-    objODMJob.dictJobLocations["step_2_filelist"]       = objODMJob.jobDir + "/_filelist.templist.txt"
-    objODMJob.dictJobLocations["step_2_macthes_jobs"]   = objODMJob.jobDir + "/_matches_jobs.templist.txt"
-    objODMJob.dictJobLocations["step_2_matches_dir"]    = objODMJob.jobDir + "/matches"
-    objODMJob.dictJobLocations["step_2_matches"]        = objODMJob.jobDir + "/matches.init.txt"
+    objSfMJob.dictJobLocations["step_2_filelist"]       = objSfMJob.jobDir + "/_filelist.templist.txt"
+    objSfMJob.dictJobLocations["step_2_macthes_jobs"]   = objSfMJob.jobDir + "/_matches_jobs.templist.txt"
+    objSfMJob.dictJobLocations["step_2_matches_dir"]    = objSfMJob.jobDir + "/matches"
+    objSfMJob.dictJobLocations["step_2_matches"]        = objSfMJob.jobDir + "/matches.init.txt"
 
-    objODMJob.dictJobLocations["step_3_filelist"]       = objODMJob.jobDir + "/list.txt"
-    objODMJob.dictJobLocations["step_3_bundlerOptions"] = objODMJob.jobDir + "/options.txt"
+    objSfMJob.dictJobLocations["step_3_filelist"]       = objSfMJob.jobDir + "/list.txt"
+    objSfMJob.dictJobLocations["step_3_bundlerOptions"] = objSfMJob.jobDir + "/options.txt"
 
     try:
-        os.mkdir(objODMJob.jobDir)
+        os.mkdir(objSfMJob.jobDir)
     except:
         pass
  
 
-    for objPhotos in objODMJob.listObjPhotos:
+    for objPhotos in objSfMJob.listObjPhotos:
         if objPhotos.isOk: 
-            objPhotos.dictStepVals["step_0_resizedImage"] = objODMJob.jobDir +\
+            objPhotos.dictStepVals["step_0_resizedImage"] = objSfMJob.jobDir +\
                 os.sep + str(objPhotos.strFileNameBase) + ".jpg"
             
-            objPhotos.dictStepVals["step_1_pgmFile"]      = objODMJob.jobDir +\
+            objPhotos.dictStepVals["step_1_pgmFile"]      = objSfMJob.jobDir +\
                 os.sep + str(objPhotos.strFileNameBase) + ".pgm"
             
-            objPhotos.dictStepVals["step_1_keyFile"]      = objODMJob.jobDir +\
+            objPhotos.dictStepVals["step_1_keyFile"]      = objSfMJob.jobDir +\
                 os.sep + str(objPhotos.strFileNameBase) + ".key"
             
-            objPhotos.dictStepVals["step_1_gzFile"]       = objODMJob.jobDir +\
+            objPhotos.dictStepVals["step_1_gzFile"]       = objSfMJob.jobDir +\
                 os.sep + str(objPhotos.strFileNameBase) + ".key.gz"
-    return objODMJob
+    return objSfMJob
 
 
 
@@ -1339,7 +1273,9 @@ def odm_orthophoto():
 
 if __name__ == '__main__':
     
-    objODMJob = prepare_objects()
+    SfMConfig = SfMInstanceConfig()
+    
+    objODMJob = prepare_objects(SfMConfig)
 
     os.chdir(objODMJob.jobDir)
 
