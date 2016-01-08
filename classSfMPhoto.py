@@ -15,6 +15,7 @@ class SfMPhoto:
         self.strFileName            = os.path.split(inputJPG)[1]
         self.strFileNameBase        = os.path.splitext(self.strFileName)[0]
         self.strFileNameExt         = os.path.splitext(self.strFileName)[1]
+              
         
         #unpack objSfMConfig
         objSfMConfig = objSfMJob.objSfMConfig
@@ -42,6 +43,7 @@ class SfMPhoto:
             # check if we've read all atts
             intListCount += 1
             if intListCount == intNumCameraAtts: flagDoneList = True
+            flagBogusValue = False
 
             #extract and proceed            
             firstColon = lines.find(":")
@@ -70,95 +72,100 @@ class SfMPhoto:
             elif tempKey == 'GPS Longitude': self.gpsLongitude = tempVal
             elif tempKey == 'GPS Altitude': self.gpsAltitude = tempVal
             elif tempKey == 'JPEG Quality': self.jpgQuality = tempVal	
-            #  better object attribute names; keep old for compatability
-            #  shallow references point to same stack space
-            self.fullPathAndName = self.fileName
+            else: 
+                flagBogusValue = True
+                print "    Found unknow attribute in photo exif "+tempKey
+            
+        #  better object attribute names; keep old for compatability
+        #  shallow references point to same stack space
+        self.fullPathAndName = self.fileName
 
-            # attribute 'id' set to more specific of the maker or model
-            try:
-                if self.cameraMake:
-                    self.make = self.cameraMake
-                    self.id = self.cameraMake + " " + self.cameraModel
-            except:  pass
+        # attribute 'id' set to more specific of the maker or model
+        try:
+            if hasattr(self,"cameraMake"):
+                self.make = self.cameraMake
+                self.id = self.cameraMake + " " + self.cameraModel
+        except:  pass
 
 
-            try:
-                if self.cameraModel:
-                    self.model = self.cameraModel
-                    self.id = self.cameraMake + " " + self.cameraModel
-            except:  pass
+        try:
+            if hasattr(self,"cameraModel"):
+                self.model = self.cameraModel
+                self.id = self.cameraMake + " " + self.cameraModel
+        except:  pass
 
-            # parse resolution field 
-            try:
-                match = re.search("([0-9]*) x ([0-9]*)",self.resolution)
+        # parse resolution field 
+        try:
+            match = re.search("([0-9]*) x ([0-9]*)",self.resolution)
+            if match:
+                self.width  = int(match.group(1).strip())
+                self.height = int(match.group(2).strip())
+        except:  pass
+
+        #parse force-focal
+        try:
+            if not '--force-focal' in args:
+                match = re.search(":[\ ]*([0-9\.]*)mm", self.focalLength)
                 if match:
-                    self.width  = int(match.group(1).strip())
-                    self.height = int(match.group(2).strip())
-            except:  pass
+                    self.focal = float((match.group()[1:-2]).strip())
+            else:
+                self.focal = args['--force-focal']
+        except: pass
 
-            #parse force-focal
-            try:
-                if not '--force-focal' in args:
-                    match = re.search(":[\ ]*([0-9\.]*)mm", self.focalLength)
-                    if match:
-                        self.focal = float((match.group()[1:-2]).strip())
-                else:
-                    self.focal = args['--force-focal']
-            except: pass
-
-            #parse force-ccd
-            if 'ccd' in lines.lower():
-                if not '--force-ccd' in args:
-                    try:
-                        floats = extractFloat(self.ccdWidth)
-                        self.ccd = floats[0]
-                    except:
-                        try:
-                            self.ccd = float(ccdWidths[self.id])
-                        except: pass
-                else:
-                    self.ccd = args['--force-ccd']
-
-            try:                
-                if self.id:
-                    self.ccd = float(ccdWidths[self.id])
-            except:
-                pass
-            if verbose:  print intListCount
-
-            if flagDoneList:
+        #parse force-ccd
+        if 'ccd' in lines.lower():
+            if not '--force-ccd' in args:
                 try:
-                    if self.width > self.height:
-                        self.focalpx = self.width * (self.focal / self.ccd)
-                    else:
-                        self.focalpx = self.height * (self.focal / self.ccd)
-
-                    self.isOk = True
-                    objSfMJob.good += 1
-
-                    print "     using " + self.fileName + "     dimensions: " + \
-                          str(self.width) + "x" + str(self.height)\
-                          + " | focal: " + str(self.focal) \
-                          + "mm | ccd: " + str(self.ccd) + "mm"
-
+                    floats = extractFloat(self.ccdWidth)
+                    self.ccd = floats[0]
                 except:
-                    self.isOk = False
-                    objSfMJob.bad += 1
-
                     try:
-                        print "\n    no CCD width or focal length found for "\
-                              + self.fileName+ " - camera: \"" + self.id+ "\""
-                    except:
-                        print "\n    no CCD width or focal length found"
+                        self.ccd = float(ccdWidths[self.id])
+                    except: pass
+            else:
+                self.ccd = args['--force-ccd']
 
-                #either way increment total count
-                objSfMJob.count += 1
+        try:                
+            if hasattr(self,"id"):
+                if verbose: print self.id
+                self.ccd = float(objSfMConfig.dictCCDWidths[self.id])
+        except:
+            pass
+        if verbose:  print intListCount
 
-                #populate & update max/mins
+        #if flagDoneList:
+        try:
+            if self.width > self.height:
+                self.focalpx = self.width * (self.focal / self.ccd)
+            else:
+                self.focalpx = self.height * (self.focal / self.ccd)
 
+            self.isOk = True
+            objSfMJob.good += 1
+        
+            print "     using " + self.fileName + "     dimensions: " + \
+                  str(self.width) + "x" + str(self.height)\
+                  + " | focal: " + str(self.focal) \
+                  + "mm | ccd: " + str(self.ccd) + "mm"
+
+        except:
+            self.isOk = False
+            objSfMJob.bad += 1
+
+            try:
+                print "\n    no CCD width or focal length found for "\
+                      + self.fileName+ " - camera: \"" + self.id+ "\""
+            except:
+                print "\n    no CCD width or focal length found"
+
+        #either way increment total count
+            objSfMJob.count += 1
+
+            #populate & update max/mins
+
+            if hasattr(self,'ccdWidth'):
                 if objSfMJob.minWidth == 0:
-                    objSfMJob.minWidth = self.width
-
+                    objSfMJob.minWidth = self.ccdWidth
                 if objSfMJob.minHeight == 0:
                     objSfMJob.minHeight = self.height
 

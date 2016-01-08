@@ -1,5 +1,6 @@
 import os
 import multiprocessing
+import json
 
 # # #
 # 0 - the defs
@@ -26,4 +27,11 @@ class SfMInstanceConfig:
         
         self.dictOSBins = dictOSBins
         self.BIN_PATH = BIN_PATH
+        
+        def get_ccd_widths():
+            """Return the CCD Width of the camera listed in the JSON defs file."""
+            with open(self.BIN_PATH_ABS + '/ccd_defs.json') as jsonFile:
+                return json.load(jsonFile)  
+        
+        self.dictCCDWidths = get_ccd_widths()
 

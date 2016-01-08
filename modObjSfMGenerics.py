@@ -17,11 +17,6 @@ def extractFloat(inputString):
     x = map(float, re.findall(r'[+-]?[0-9.]+', inputString))
     return x
 
-def get_ccd_widths():
-    """Return the CCD Width of the camera listed in the JSON defs file."""
-    with open(BIN_PATH_ABS + '/ccd_defs.json') as jsonFile:
-        return json.load(jsonFile)
-
 def remove_values_from_list(the_list, val):
     '''  Remove the <val> from <the_list> '''
     return [value for value in the_list if value != val]
@@ -41,3 +36,4 @@ def mkdir_p(path):
     except os.error as exc:
         if exc.errno != errno.EEXIST or not os.path.isdir(path):
             raise
+        

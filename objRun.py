@@ -45,7 +45,8 @@ objSfMConfig = SfMInstanceConfig()
 
 class SfMJob:
     '''   ODMJob - a class for ODM Activities
-    '''
+    '''      
+        
     def __init__(self, inputDir, args, objSfMConfig):
         self.args = args
         self.pathDirJPGs = inputDir
@@ -74,7 +75,7 @@ class SfMJob:
         self.listFiles = os.listdir(objSfMConfig.CURRENT_DIR)
         self.listJPG = []
         self.listObjPhotos = []    
-
+        
         
         # create obj.listJPG of all jpegs 
         for files in self.listFiles:
@@ -523,13 +524,9 @@ class SfMJob:
 # 2 - Parse Arguments
 # #
 
-def get_ccd_widths():
-    """Return the CCD Width of the camera listed in the JSON defs file."""
-    with open(objSfMConfig.BIN_PATH_ABS + '/ccd_defs.json') as jsonFile:
-        return json.load(jsonFile)
+
 
 objects = []
-ccdWidths = get_ccd_widths()
 
 objectStats = {
     'count': 0, 'good': 0, 'bad': 0, 'minWidth': 0, 'minHeight': 0,
